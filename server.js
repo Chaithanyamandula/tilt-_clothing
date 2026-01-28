@@ -17,15 +17,15 @@ app.get("/", (req, res) => {
 app.post("/buy", async (req, res) => {
   const { product, price, name, phone, email, address } = req.body;
 
-  const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS
-    }
-  });
+ const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  secure: false, // MUST be false for 587
+  auth: {
+    user: process.env.SMTP_EMAIL,
+    pass: process.env.SMTP_PASSWORD,
+  },
+});
 
   const mailOptions = {
     from: `"TiLt Clothing" <${process.env.SMTP_USER}>`,
