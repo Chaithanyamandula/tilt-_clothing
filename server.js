@@ -17,18 +17,23 @@ app.get("/", (req, res) => {
 app.post("/buy", async (req, res) => {
   const { product, price, name, phone, email, address } = req.body;
 
- const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: false, // MUST be false for 587
-  auth: {
-    user: process.env.SMTP_EMAIL,
-    pass: process.env.SMTP_PASSWORD,
-  },
-});
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT), // FIXED
+    secure: false,
+    auth: {
+      user: process.env.SMTP_EMAIL,
+      pass: process.env.SMTP_PASSWORD,
+    },
+  });
+
+  transporter.verify((err) => {
+    if (err) console.error("SMTP ERROR ❌", err);
+    else console.log("SMTP READY ✅");
+  });
 
   const mailOptions = {
-    from: `"TiLt Clothing" <${process.env.SMTP_USER}>`,
+    from: `"TiLt Clothing" <${process.env.SMTP_EMAIL}>`, // FIXED
     to: process.env.ADMIN_EMAIL,
     subject: "🛒 New Order - TiLt Clothing",
     html: `
@@ -48,11 +53,11 @@ app.post("/buy", async (req, res) => {
     await transporter.sendMail(mailOptions);
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
+    console.error("SEND MAIL ERROR ❌", err);
     res.json({ success: false });
   }
 });
-
-app.listen(process.env.PORT, () => {
-  console.log(`TiLt Clothing running on http://localhost:${process.env.PORT}`);
-});
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+}); 
